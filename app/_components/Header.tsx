@@ -1,4 +1,6 @@
+"use client";
 import { Button } from '@/components/ui/button';
+import { SignInButton, useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 import path from 'path';
 import React from 'react'
@@ -16,6 +18,8 @@ const Header = () => {
         path: '/contact'
     }
     ];
+
+    const {user} = useUser();
   return (
     <div className='flex w-full justify-between items-center py-4 px-8 bg-gray-800 text-white'>
         <h1>AI Trip Planner</h1>
@@ -26,9 +30,12 @@ const Header = () => {
                 </Link>
             ))}
         </div>
-        <Button variant="outline" asChild>
-            <Link href="/login" className='text-black'>Get Started</Link>
-        </Button>
+        
+        {!user ? <SignInButton mode="modal">
+            <div className='border border-white px-4 py-2 rounded hover:bg-white hover:text-black cursor-pointer'>
+                Get Started
+            </div>
+        </SignInButton> : <Link href="/create-trip"><div className="text-white" >Create New Trip</div></Link>}
     </div>
   )
 }
