@@ -6,13 +6,15 @@ export const CreateNewUser = mutation({
     handler: async (ctx, { name, imageUrl, email }) => {
         const user = await ctx.db.query("UserTable").filter((q) => q.eq(q.field("email"), email)).first();
         if (user) {
-            return user._id;
+            return user; // return full existing user object
         }
         const id = await ctx.db.insert("UserTable", {
             name,
             imageUrl,
             email,
         });
-        return id;
+        const newUser = await ctx.db.get(id);
+        // If for some reason the fetch fails, fall back to returning the id
+        return newUser ?? id;
     }
 })

@@ -1,9 +1,11 @@
 "use client";
-import React from 'react'
+import React, { use, useState } from 'react'
 import Header from './_components/Header';
 import { useMutation } from 'convex/react';
 import { api } from '@/convex/_generated/api';
 import { useUser } from '@clerk/nextjs';
+import { User } from 'lucide-react';
+import { UserDetailContext } from '@/context/UserDetailContext';
 
 const Provider = ({
   children,
@@ -11,6 +13,7 @@ const Provider = ({
   children: React.ReactNode;
 }>) => {
 
+  const [userDetail, setUserDetail] = useState<any>(null);
   const createUser = useMutation(api.user.CreateNewUser);
   const {user} = useUser();
 
@@ -20,20 +23,23 @@ const Provider = ({
 
   const createNewUser = async () => {
     if(user) {
-      const userId = await createUser({
-      name: user?.fullName || '',
-      imageUrl: user?.imageUrl || '',
-      email: user?.primaryEmailAddress?.emailAddress || '',
-    });
-    console.log('Created user with ID:', userId);
+      const userD = await createUser({
+        name: user?.fullName || '',
+        imageUrl: user?.imageUrl || '',
+        email: user?.primaryEmailAddress?.emailAddress || '',
+      });
+      setUserDetail(userD);
+    
     }
   }
 
   return (
+    <UserDetailContext.Provider value={{userDetail, setUserDetail}}>
     <div>
       <Header/>
       {children}
       </div>
+      </UserDetailContext.Provider>
   )
 }
 
