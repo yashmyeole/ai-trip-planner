@@ -7,7 +7,7 @@ import { Send } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import React from 'react'
 
-const suggestion = [
+export const suggestion = [
   {
     title: "Trip to Paris",
     icon : "🌍"
@@ -34,6 +34,7 @@ const Hero = () => {
       router.push('/sign-in');
       return;
     }
+    router.push('/create-new-trip');
   }
   return (
     <div className='mt-24 flex item-center flex-col gap-8'>

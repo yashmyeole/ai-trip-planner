@@ -43,4 +43,6 @@ const Provider = ({
   )
 }
 
-export default Provider
+export default Provider;
+
+export const useUserDetail = () => React.useContext(UserDetailContext);
