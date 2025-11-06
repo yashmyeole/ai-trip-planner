@@ -1,7 +1,7 @@
 import arcjet, { tokenBucket } from "@arcjet/next";
 import { NextResponse } from "next/server";
 
-export const aj = arcjet({
+const aj = arcjet({
   key: process.env.ARCJET_KEY!, // Get your site key from https://app.arcjet.com
   rules: [
     // Create a token bucket rate limit. Other algorithms are supported.
@@ -23,7 +23,7 @@ export async function GET(req: Request) {
   if (decision.isDenied()) {
     return NextResponse.json(
       { error: "Too Many Requests", reason: decision.reason },
-      { status: 429 },
+      { status: 429 }
     );
   }
 

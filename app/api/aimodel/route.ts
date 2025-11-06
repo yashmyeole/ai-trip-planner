@@ -3,8 +3,8 @@ import { tr } from "motion/react-client";
 import { NextRequest, NextResponse } from "next/server";
 
 import OpenAI from "openai";
-import { aj } from "../arcject/route";
 import { auth, currentUser } from "@clerk/nextjs/server";
+import arcjet, { tokenBucket } from "@arcjet/next";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
@@ -148,6 +148,20 @@ Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and
 export async function POST(req: NextRequest) {
   try {
     const { messages, isFinal } = await req.json();
+
+    const aj = arcjet({
+      key: process.env.ARCJET_KEY!, // Get your site key from https://app.arcjet.com
+      rules: [
+        // Create a token bucket rate limit. Other algorithms are supported.
+        tokenBucket({
+          mode: "LIVE", // will block requests. Use "DRY_RUN" to log only
+          characteristics: ["userId"], // track requests by a custom user ID
+          refillRate: 5, // refill 5 tokens per interval
+          interval: 86400, // refill every 10 seconds
+          capacity: 10, // bucket maximum capacity of 10 tokens
+        }),
+      ],
+    });
 
     const user = await currentUser();
     const { has } = await auth();
