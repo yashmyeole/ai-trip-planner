@@ -4,8 +4,8 @@ import Hero from "./_components/Hero";
 
 export default function Home() {
   return (
-    <div >
-     <Hero />
+    <div className="h-full overflow-hidden flex flex-col items-center justify-center py-2 bg-linear-to-b from-sky-100 to-indigo-100">
+      <Hero />
     </div>
   );
 }

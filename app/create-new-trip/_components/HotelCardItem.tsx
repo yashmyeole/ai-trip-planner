@@ -29,11 +29,11 @@ const HotelCardItem = ({ hotel}:any) => {
   return (
     <div className="mb-6 p-4 border border-gray-200 rounded-lg">
         <div className="flex items-center mb-4">
-            {placeDetails?.photoUrl ? (
+            {/* {placeDetails?.photoUrl ? (
                 <img src={placeDetails.photoUrl} alt={hotel.hotel_name} className="w-20 h-20 object-cover rounded-lg mr-4" />
             ) : (
                 <Image width={12} height={12} src={hotel?.hotel_image_url} alt={hotel.hotel_name} className="w-20 h-20 object-cover rounded-lg mr-4"/>
-            )}
+            )} */}
             <div>
                 <h3 className="text-xl font-semibold">{hotel.hotel_name}</h3>
                 <p className="text-sm text-gray-500">{hotel.hotel_address}</p>

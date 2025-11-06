@@ -2,13 +2,13 @@ import { useUser } from "@clerk/nextjs";
 import { tr } from "motion/react-client";
 import { NextRequest, NextResponse } from "next/server";
 
-import OpenAI from "openai"
+import OpenAI from "openai";
 import { aj } from "../arcject/route";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 
-export const openai = new OpenAI({
+const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
-})
+});
 
 const PROMPT = `You are an AI Trip Planner Agent. Ask exactly one relevant trip-related question at a time and wait for the user's answer before asking the next.
 
@@ -35,8 +35,14 @@ Examples (each line is a complete valid model response):
 {"resp":"How many days do you plan to travel?","ui":"tripDuration"}
 {"resp":"Please list your travel interests, e.g., adventure, sightseeing, food.","ui":"travelInterests"}
 
-Follow these rules strictly so the client can render the correct UI component.`;
+Additional instructions:
+- Ensure the image links you provide are direct URLs to the image files (ending in .jpg, .png, etc.) so they can be rendered properly.
+- Image links must be publicly accessible without authentication and should not be unauthorize.
+- If providing multiple image links, ensure each link is valid and accessible.
+- Make sure the link you provide should not give 404 or any other error while loading.
+- Make sure the "ui" given by you is strictly one of the specified tokens and is perfectly relevant to the question you are asking.
 
+Follow these rules strictly so the client can render the correct UI component.`;
 
 const FINALPROMPT = `Generate Travel Plan with give details, give me Hotels options list with HotelName, 
 
@@ -132,20 +138,30 @@ Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and
 
     ]
 
-  }`
+  }
+    
+  Additional instructions:
+- Ensure the image links you provide are direct URLs to the image files (ending in .jpg, .png, etc.) so they can be rendered properly.
+- Image links must be publicly accessible without authentication.
+- If providing multiple image links, ensure each link is valid and accessible.`;
 
 export async function POST(req: NextRequest) {
   try {
     const { messages, isFinal } = await req.json();
 
     const user = await currentUser();
-    const decision = await aj.protect(req, { userId: user?.id ?? "anonymous", requested: 5 });
+    const { has } = await auth();
+    const hasPremium = has({ plan: "monthly" });
+    const decision = await aj.protect(req, {
+      userId: user?.id ?? "anonymous",
+      requested: 5,
+    });
 
     // console.log(decision)
-    if(decision?.conclusion=='DENY'){
+    if (decision?.conclusion == "DENY" && !hasPremium) {
       return NextResponse.json(
         { error: "Done for the day", reason: decision.reason },
-        { status: 200 },
+        { status: 200 }
       );
     }
 
@@ -157,9 +173,9 @@ export async function POST(req: NextRequest) {
     // ✅ Call the OpenAI API safely
     const completion = await openai.chat.completions.create({
       model: "gpt-4.1-mini",
-      response_format:{ type:"json_object"},
+      response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: isFinal? FINALPROMPT: PROMPT },
+        { role: "system", content: isFinal ? FINALPROMPT : PROMPT },
         ...messages,
       ],
     });
