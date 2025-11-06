@@ -6,6 +6,7 @@ import { api } from '@/convex/_generated/api';
 import { useUser } from '@clerk/nextjs';
 import { User } from 'lucide-react';
 import { UserDetailContext } from '@/context/UserDetailContext';
+import { TripDetailContext } from '@/context/TripDetailContext';
 
 const Provider = ({
   children,
@@ -14,8 +15,10 @@ const Provider = ({
 }>) => {
 
   const [userDetail, setUserDetail] = useState<any>(null);
+  const [tripDetailInfo, setTripDetailInfo] = useState<any>(null);
   const createUser = useMutation(api.user.CreateNewUser);
   const {user} = useUser();
+
 
   React.useEffect(() => {
     user && createNewUser();
@@ -35,14 +38,17 @@ const Provider = ({
 
   return (
     <UserDetailContext.Provider value={{userDetail, setUserDetail}}>
-    <div>
-      <Header/>
-      {children}
+      <TripDetailContext.Provider value={{tripDetailInfo, setTripDetailInfo}}>
+      <div>
+        <Header/>
+        {children}
       </div>
-      </UserDetailContext.Provider>
+      </TripDetailContext.Provider>
+    </UserDetailContext.Provider>
   )
 }
 
 export default Provider;
 
 export const useUserDetail = () => React.useContext(UserDetailContext);
+export const useTripDetail = () => React.useContext(TripDetailContext);
