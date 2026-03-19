@@ -173,7 +173,8 @@ const MyTrips = () => {
 
   const convex = useConvex();
   const deleteUserTrip = useMutation(api.tripDetails.DeleteUserTrip);
-  const { userDetail } = useUserDetail();
+  const userCtx = useUserDetail();
+  const userDetail = userCtx?.userDetail;
 
   useEffect(() => {
     if (userDetail) {
