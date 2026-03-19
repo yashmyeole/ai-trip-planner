@@ -1,5 +1,5 @@
 import React from "react";
-import { AgentResponse } from "../agents/interfaces";
+import { AgentResponse } from "../../agents/interfaces";
 
 interface AgentLogProps {
   logs: AgentResponse[];
