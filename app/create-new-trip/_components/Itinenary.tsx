@@ -272,7 +272,8 @@ import { useTripDetail } from "@/app/provider";
 // }
 
 const Itinenary = () => {
-  const { tripDetailInfo: TRIP_DATA } = useTripDetail();
+  const tripCtx = useTripDetail();
+  const TRIP_DATA = tripCtx?.tripDetailInfo;
   // console.log("TRIP DATA IN ITINENARY:", TRIP_DATA);
   const hotels = TRIP_DATA?.hotels ?? [];
   const itinerary = TRIP_DATA?.itinerary ?? [];

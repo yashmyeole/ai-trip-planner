@@ -1,5 +1,5 @@
 "use client";
-import { TripInfo } from "@/app/create-new-trip/_components/Chatbox";
+import { TripDetail } from "@/context/TripDetailContext";
 import { Calendar, Users, Wallet } from "lucide-react";
 import {
   useMotionValueEvent,
@@ -20,7 +20,7 @@ export const Timeline = ({
   tripData,
 }: {
   data: TimelineEntry[];
-  tripData: TripInfo;
+  tripData: TripDetail;
 }) => {
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
