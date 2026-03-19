@@ -25,7 +25,7 @@ const Header = () => {
   const { user } = useUser();
   const router = useRouter();
   return (
-    <div className="flex w-full h-[8vh] justify-between items-center py-4 px-8 bg-linear-to-r from-sky-400 to-indigo-400 text-slate-900">
+    <div className="flex w-full h-full justify-between items-center px-8 bg-linear-to-r from-sky-400 to-indigo-400 text-slate-900">
       <div
         className="flex items-center gap-4 cursor-pointer"
         onClick={() => router.push("/")}

@@ -1,6 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { HeroVideoDialog } from "@/components/ui/hero-video-dialog";
+import DemoCredentials from "./DemoCredentials";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -118,6 +119,8 @@ const Hero = ({ centerHeight = "560px" }: HeroProps) => {
                 See pricing
               </button>
             </div>
+
+            <DemoCredentials />
 
             <div className="mt-8 text-sm text-gray-500">
               <span className="font-medium">

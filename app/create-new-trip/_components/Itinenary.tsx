@@ -1,12 +1,12 @@
 "use client";
-import { Button } from '@/components/ui/button';
-import { Timeline } from '@/components/ui/timeline';
-import Image from 'next/image';
-import Link from 'next/link';
-import React from 'react'
-import HotelCardItem from './HotelCardItem';
-import PlaceCardItem from './PlaceCardItem';
-import { useTripDetail } from '@/app/provider';
+import { Button } from "@/components/ui/button";
+import { Timeline } from "@/components/ui/timeline";
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
+import HotelCardItem from "./HotelCardItem";
+import PlaceCardItem from "./PlaceCardItem";
+import { useTripDetail } from "@/app/provider";
 
 // const TRIP_DATA = {
 //   budget: "Medium",
@@ -272,37 +272,101 @@ import { useTripDetail } from '@/app/provider';
 // }
 
 const Itinenary = () => {
-  const {tripDetailInfo: TRIP_DATA} =  useTripDetail();
+  const { tripDetailInfo: TRIP_DATA } = useTripDetail();
   // console.log("TRIP DATA IN ITINENARY:", TRIP_DATA);
   const hotels = TRIP_DATA?.hotels ?? [];
   const itinerary = TRIP_DATA?.itinerary ?? [];
+  const transportGuide = TRIP_DATA?.transport_guide;
 
   const data = [
+    ...(transportGuide
+      ? [
+          {
+            title: "Transport Plan",
+            content: (
+              <div className="bg-white border border-gray-100 rounded-[20px] p-5 shadow-sm">
+                <h4 className="text-lg font-bold text-slate-800">Outbound</h4>
+                <div className="mt-3 space-y-3">
+                  {(transportGuide?.outbound || []).map(
+                    (leg: any, idx: number) => (
+                      <div
+                        key={`out-${idx}`}
+                        className="rounded-xl border border-slate-100 p-3 bg-slate-50"
+                      >
+                        <div className="text-sm font-semibold text-slate-800">
+                          {leg.from} {" -> "} {leg.to}
+                        </div>
+                        <div className="text-sm text-slate-600 mt-1">
+                          {leg.recommended_mode}
+                        </div>
+                        <div className="text-xs text-slate-500 mt-1">
+                          Leave: {leg.leave_at} | Arrive: {leg.arrive_at} |
+                          Duration: {leg.estimated_duration}
+                        </div>
+                      </div>
+                    ),
+                  )}
+                </div>
+                <h4 className="text-lg font-bold text-slate-800 mt-6">
+                  Return
+                </h4>
+                <div className="mt-3 space-y-3">
+                  {(transportGuide?.return_journey || []).map(
+                    (leg: any, idx: number) => (
+                      <div
+                        key={`ret-${idx}`}
+                        className="rounded-xl border border-slate-100 p-3 bg-slate-50"
+                      >
+                        <div className="text-sm font-semibold text-slate-800">
+                          {leg.from} {" -> "} {leg.to}
+                        </div>
+                        <div className="text-sm text-slate-600 mt-1">
+                          {leg.recommended_mode}
+                        </div>
+                        <div className="text-xs text-slate-500 mt-1">
+                          Leave: {leg.leave_at} | Arrive: {leg.arrive_at} |
+                          Duration: {leg.estimated_duration}
+                        </div>
+                      </div>
+                    ),
+                  )}
+                </div>
+              </div>
+            ),
+          },
+        ]
+      : []),
     {
       title: "Recommended Hotels",
       content: (
         <div>
-            {hotels.map((hotel: any, index: number) => (
-                <HotelCardItem key={index} hotel={hotel}/>
-            ))}
+          {hotels.map((hotel: any, index: number) => (
+            <HotelCardItem key={index} hotel={hotel} />
+          ))}
         </div>
       ),
     },
-    ...itinerary.map((day:any, index:any) => ({
+    ...itinerary.map((day: any, index: any) => ({
       title: `Day ${day.day}: ${day.day_plan}`,
-      content: (
-        <PlaceCardItem day={day} key={index}/>
-      ),
+      content: <PlaceCardItem day={day} key={index} />,
     })),
   ];
   return (
-    <div className={`relative w-full h-[87vh] overflow-y-scroll ${TRIP_DATA && "px-4 py-6"} border border-gray-300 rounded-lg`}>
-      {TRIP_DATA && <Timeline data={data} tripData={TRIP_DATA}/>}
-      {!TRIP_DATA && <div className="flex flex-col items-center justify-center h-full">
-        <Image src="/Travel.png" className='w-full h-full' alt="No Data" width={150} height={150} />
-      </div>}
+    <div className={`relative w-full ${TRIP_DATA ? "px-6 py-8" : ""}`}>
+      {TRIP_DATA && <Timeline data={data} tripData={TRIP_DATA} />}
+      {!TRIP_DATA && (
+        <div className="flex flex-col items-center justify-center p-10 opacity-50">
+          <Image
+            src="/Travel.png"
+            className="w-full object-contain max-w-sm drop-shadow-md"
+            alt="No Data"
+            width={300}
+            height={300}
+          />
+        </div>
+      )}
     </div>
   );
-}
+};
 
-export default Itinenary
+export default Itinenary;

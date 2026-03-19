@@ -1,69 +1,72 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 
 type Props = {
-  onSelectedDays?: (days: number) => void
-  initialDays?: number
-  onDone?: (days: number) => void
-}
+  onSelectedDays?: (days: number) => void;
+  initialDays?: number;
+  onDone?: (days: number) => void;
+};
 
 const DurationUI = ({ onSelectedDays, initialDays = 2, onDone }: Props) => {
-  const clamp = (n: number) => Math.max(2, Math.min(15, n))
-  const [days, setDays] = useState<number>(clamp(initialDays))
+  const clamp = (n: number) => Math.max(2, Math.min(15, n));
+  const [days, setDays] = useState<number>(clamp(initialDays));
 
   useEffect(() => {
-    onSelectedDays?.(days)
-  }, [days, onSelectedDays])
+    onSelectedDays?.(days);
+  }, [days, onSelectedDays]);
 
-  const dec = () => setDays((d) => clamp(d - 1))
-  const inc = () => setDays((d) => clamp(d + 1))
+  const dec = () => setDays((d) => clamp(d - 1));
+  const inc = () => setDays((d) => clamp(d + 1));
 
   return (
-    <div>
-      <div className="p-4 rounded-lg mb-4 bg-white shadow-sm border border-transparent hover:border-blue-100 transition">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold">Trip duration</h3>
-            <p className="text-gray-600 text-sm">Choose how many days you want to travel</p>
+    <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 w-full max-w-md">
+      <h3 className="text-xl font-bold text-gray-900 mb-1">Trip duration</h3>
+      <p className="text-gray-600 text-sm mb-6">
+        Choose how many days you want to travel
+      </p>
+
+      <div className="flex items-center justify-between gap-4 bg-gray-50 p-4 rounded-[20px] mb-6">
+        <button
+          aria-label="decrease days"
+          onClick={dec}
+          disabled={days <= 2}
+          className={`w-12 h-12 rounded-full flex items-center justify-center text-3xl font-medium transition-colors ${days <= 2 ? "opacity-40 cursor-not-allowed text-gray-400" : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm"}`}
+        >
+          −
+        </button>
+
+        <div className="flex-1 text-center">
+          <div className="inline-flex items-baseline gap-2">
+            <span className="text-5xl font-extrabold text-blue-500">
+              {days}
+            </span>
+            <span className="text-gray-500 font-medium">days</span>
           </div>
         </div>
 
-  <div className="mt-4 flex items-center justify-between gap-4">
-          <button
-            aria-label="decrease days"
-            onClick={dec}
-            disabled={days <= 2}
-            className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl transition-colors ${days <= 2 ? 'opacity-40 cursor-not-allowed bg-gray-50' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'}`}>
-            −
-          </button>
+        <button
+          aria-label="increase days"
+          onClick={inc}
+          disabled={days >= 15}
+          className={`w-12 h-12 rounded-full flex items-center justify-center text-3xl font-medium transition-colors ${days >= 15 ? "opacity-40 cursor-not-allowed text-gray-400" : "bg-white text-gray-700 hover:bg-gray-100 shadow-sm"}`}
+        >
+          +
+        </button>
+      </div>
 
-          <div className="flex-1 text-center">
-            <div className="inline-flex items-baseline gap-3 bg-linear-to-r from-blue-50 to-white px-6 py-3 rounded-lg shadow-sm">
-              <span className="text-4xl font-bold text-slate-900">{days}</span>
-              <span className="text-slate-600">days</span>
-            </div>
-            <p className="text-sm text-gray-500 mt-2">Minimum 2 · Maximum 15</p>
-          </div>
+      <p className="text-center text-sm text-gray-500 mb-6">
+        Minimum 2 · Maximum 15
+      </p>
 
-          <button
-            aria-label="increase days"
-            onClick={inc}
-            disabled={days >= 15}
-            className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl transition-colors ${days >= 15 ? 'opacity-40 cursor-not-allowed bg-gray-50' : 'bg-blue-50 text-blue-700 hover:bg-blue-100'}`}>
-            +
-          </button>
-        </div>
-
-        <div className="mt-4 flex justify-end">
-          <button
-            onClick={() => onDone?.(days)}
-            className="px-4 py-2 bg-sky-600 text-white rounded-lg hover:bg-sky-700 disabled:opacity-50 shadow"
-          >
-            Done
-          </button>
-        </div>
+      <div className="w-full">
+        <button
+          onClick={() => onDone?.(days)}
+          className="w-full py-3 bg-[#8BB9E3] text-white font-semibold rounded-xl hover:bg-blue-400 transition-colors"
+        >
+          Done
+        </button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DurationUI
+export default DurationUI;

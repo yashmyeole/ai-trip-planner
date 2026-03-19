@@ -36,9 +36,9 @@ const Provider = ({
   return (
     <UserDetailContext.Provider value={{ userDetail, setUserDetail }}>
       <TripDetailContext.Provider value={{ tripDetailInfo, setTripDetailInfo }}>
-        <div>
+        <div className="h-full grid grid-rows-[8dvh_1fr] overflow-hidden">
           <Header />
-          <div className="max-h-[92vh] h-[92vh]">{children}</div>
+          <div className="min-h-0 overflow-y-auto">{children}</div>
         </div>
       </TripDetailContext.Provider>
     </UserDetailContext.Provider>

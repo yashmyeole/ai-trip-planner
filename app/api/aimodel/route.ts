@@ -1,5 +1,3 @@
-import { useUser } from "@clerk/nextjs";
-import { tr } from "motion/react-client";
 import { NextRequest, NextResponse } from "next/server";
 
 import OpenAI from "openai";
@@ -44,110 +42,100 @@ Additional instructions:
 
 Follow these rules strictly so the client can render the correct UI component.`;
 
-const FINALPROMPT = `Generate Travel Plan with give details, give me Hotels options list with HotelName, 
+const FINALPROMPT = `Generate a complete travel plan in JSON using user details and transport context if provided.
 
-Hotel address, Price, hotel image url, geo coordinates, rating, descriptions and  suggest itinerary with placeName, Place Details, Place Image Url,
+You must provide:
+- Luggage-friendly transport guidance from origin -> destination and destination -> origin.
+- Practical first/last-mile guidance (example: Kalyan -> BOM airport by app cab, not local train when carrying 2+ big bags).
+- Exact timing guidance for transport and activities.
 
- Geo Coordinates,Place address, ticket Pricing, Time travel each of the location , with each day plan with best time to visit in JSON format.
+Generate travel plan with hotels and itinerary in JSON.
 
- Output Schema:
-
- {
-
+Output Schema:
+{
   "trip_plan": {
-
     "destination": "string",
-
     "duration": "string",
-
     "origin": "string",
-
     "budget": "string",
-
     "group_size": "string",
-
     "hotels": [
-
       {
-
         "hotel_name": "string",
-
         "hotel_address": "string",
-
         "price_per_night": "string",
-
         "hotel_image_url": "string",
-
         "geo_coordinates": {
-
           "latitude": "number",
-
           "longitude": "number"
-
         },
-
         "rating": "number",
-
         "description": "string"
-
       }
-
     ],
-
     "itinerary": [
-
       {
-
         "day": "number",
-
         "day_plan": "string",
-
         "best_time_to_visit_day": "string",
-
         "activities": [
-
           {
-
             "place_name": "string",
-
             "place_details": "string",
-
             "place_image_url": "string",
-
             "geo_coordinates": {
-
               "latitude": "number",
-
               "longitude": "number"
-
             },
-
             "place_address": "string",
-
             "ticket_pricing": "string",
-
             "time_travel_each_location": "string",
-
+            "leave_at": "string",
+            "arrive_at": "string",
+            "visit_duration": "string",
             "best_time_to_visit": "string"
-
           }
-
         ]
-
       }
-
-    ]
-
+    ],
+    "transport_guide": {
+      "outbound": [
+        {
+          "from": "string",
+          "to": "string",
+          "recommended_mode": "string",
+          "leave_at": "string",
+          "arrive_at": "string",
+          "estimated_duration": "string",
+          "note": "string"
+        }
+      ],
+      "return_journey": [
+        {
+          "from": "string",
+          "to": "string",
+          "recommended_mode": "string",
+          "leave_at": "string",
+          "arrive_at": "string",
+          "estimated_duration": "string",
+          "note": "string"
+        }
+      ],
+      "local_city_policy": [
+        { "recommendation": "string" }
+      ]
+    }
   }
-    
-  Additional instructions:
-- Ensure the image links you provide are direct URLs to the image files (ending in .jpg, .png, etc.) so they can be rendered properly.
-- Image links must be publicly accessible without authentication.
-- If providing multiple image links, ensure each link is valid and accessible.`;
+}
+
+Additional instructions:
+- Never recommend crowded local train for 2+ large bags if practical alternatives exist.
+- Ensure every day includes realistic timings and travel durations.
+- Ensure image links are direct and publicly accessible.`;
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, isFinal } = await req.json();
+    const { messages, isFinal, transportContext, startDate } = await req.json();
 
     const aj = arcjet({
       key: process.env.ARCJET_KEY!, // Get your site key from https://app.arcjet.com
@@ -156,9 +144,9 @@ export async function POST(req: NextRequest) {
         tokenBucket({
           mode: "LIVE", // will block requests. Use "DRY_RUN" to log only
           characteristics: ["userId"], // track requests by a custom user ID
-          refillRate: 5, // refill 5 tokens per interval
-          interval: 86400, // refill every 10 seconds
-          capacity: 10, // bucket maximum capacity of 10 tokens
+          refillRate: 500, // refill 5 tokens per interval
+          interval: 60, // refill every 10 seconds
+          capacity: 1000, // bucket maximum capacity of 10 tokens
         }),
       ],
     });
@@ -168,14 +156,14 @@ export async function POST(req: NextRequest) {
     const hasPremium = has({ plan: "monthly" });
     const decision = await aj.protect(req, {
       userId: user?.id ?? "anonymous",
-      requested: 5,
+      requested: 1,
     });
 
     // console.log(decision)
     if (decision?.conclusion == "DENY" && !hasPremium) {
       return NextResponse.json(
         { error: "Done for the day", reason: decision.reason },
-        { status: 200 }
+        { status: 200 },
       );
     }
 
@@ -189,7 +177,12 @@ export async function POST(req: NextRequest) {
       model: "gpt-4.1-mini",
       response_format: { type: "json_object" },
       messages: [
-        { role: "system", content: isFinal ? FINALPROMPT : PROMPT },
+        {
+          role: "system",
+          content: isFinal
+            ? `${FINALPROMPT}\n\nTrip start date: ${startDate || "Not specified"}\n\nTransport context from free APIs:\n${JSON.stringify(transportContext || {}, null, 2)}\n\nUse this context to produce transport-aware timings.`
+            : PROMPT,
+        },
         ...messages,
       ],
     });
@@ -212,7 +205,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(
       { error: error.message || "Failed to generate AI response" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

@@ -15,7 +15,13 @@ interface TimelineEntry {
   content: React.ReactNode;
 }
 
-export const Timeline = ({ data , tripData}: { data: TimelineEntry[] , tripData: TripInfo}) => {
+export const Timeline = ({
+  data,
+  tripData,
+}: {
+  data: TimelineEntry[];
+  tripData: TripInfo;
+}) => {
   const ref = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [height, setHeight] = useState(0);
@@ -40,22 +46,23 @@ export const Timeline = ({ data , tripData}: { data: TimelineEntry[] , tripData:
       className="w-full bg-white dark:bg-neutral-950 font-sans md:px-10"
       ref={containerRef}
     >
-      <div className="max-w-7xl mx-auto py-4 px-4 md:px-8 lg:px-10">
-        <h2 className="text-lg md:text-4xl mb-4 text-black dark:text-white max-w-4xl">
-          Changelog from my journey from {tripData?.origin} to {tripData?.destination} is here.
+      <div className="max-w-7xl mx-auto py-6 px-4 md:px-8 lg:px-10">
+        <h2 className="text-2xl md:text-3xl font-bold mb-4 text-slate-800 max-w-4xl tracking-tight">
+          Your Trip to{" "}
+          <span className="text-indigo-600">{tripData?.destination}</span>
         </h2>
-        <div className="flex items-center gap-6 text-black dark:text-white mt-4">
-          <div className="flex gap-2">
-            <Calendar/>
-            <h2>{tripData?.duration}</h2>
+        <div className="flex flex-wrap items-center gap-4 text-sm font-semibold text-slate-600 mt-4">
+          <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full">
+            <Calendar className="w-4 h-4 text-indigo-500" />
+            <span>{tripData?.duration}</span>
           </div>
-          <div className="flex gap-2">
-            <Wallet/>
-            <h2>{tripData?.budget}</h2>
+          <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full">
+            <Wallet className="w-4 h-4 text-green-600" />
+            <span>{tripData?.budget} Budget</span>
           </div>
-          <div className="flex gap-2">
-            <Users/>
-            <h2>{tripData?.group_size}</h2>
+          <div className="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-full">
+            <Users className="w-4 h-4 text-blue-500" />
+            <span>{tripData?.group_size}</span>
           </div>
         </div>
       </div>
@@ -64,25 +71,28 @@ export const Timeline = ({ data , tripData}: { data: TimelineEntry[] , tripData:
         {data.map((item, index) => (
           <div
             key={index}
-            className="flex justify-start pt-10 md:pt-14 md:gap-10"
+            className="flex justify-start pt-10 md:pt-14 md:gap-8"
           >
-            <div className="sticky flex flex-col md:flex-row z-40 items-center top-40 self-start max-w-xs lg:max-w-sm md:w-full">
+            <div className="sticky flex flex-col z-40 items-start top-40 self-start w-32 md:w-48 shrink-0">
               <div className="h-10 absolute left-3 md:left-3 w-10 rounded-full bg-white dark:bg-black flex items-center justify-center">
-                <div className="h-4 w-4 rounded-full bg-neutral-200 dark:bg-neutral-800 border border-neutral-300 dark:border-neutral-700 p-2" />
+                <div className="h-4 w-4 rounded-full bg-indigo-500 border-2 border-indigo-200 p-2" />
               </div>
-              <h3 className="hidden md:block text-lg md:pl-20 md:text-2xl font-bold text-neutral-500 dark:text-neutral-500 ">
-                {item.title} 
+              <h3 className="hidden md:block text-lg md:pl-16 font-bold text-slate-400">
+                {item.title.split(": ")[0]}
+                {item.title.includes(": ") && (
+                  <div className="text-sm font-medium text-slate-600 mt-1">
+                    {item.title.split(": ")[1]}
+                  </div>
+                )}
               </h3>
             </div>
 
-            <div className="relative pl-20 pr-4 md:pl-4 w-full">
-              <h3 className="md:hidden block text-lg mb-4 text-left font-bold text-neutral-500 dark:text-neutral-500">
+            <div className="relative pl-16 pr-4 md:pl-0 w-full max-w-[100%] overflow-hidden">
+              <h3 className="md:hidden block text-lg mb-4 text-left font-bold text-slate-600">
                 {item.title}
               </h3>
               {item.content}{" "}
-          
             </div>
-           
           </div>
         ))}
         <div

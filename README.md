@@ -29,8 +29,81 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Multi-Agent System Overview
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+This project is a showcase of advanced AI agent development, suitable for big tech AI Engineer and Agent Developer roles. It implements a multi-agent system for travel planning with the following features:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Agent Roles
+
+- **ItineraryAgent**: Plans daily activities, routes, and timing.
+- **BudgetAgent**: Monitors and optimizes spending, negotiates with other agents.
+- **HotelAgent**: Finds and books accommodations.
+- **InterestAgent**: Suggests activities based on user interests.
+- **DocumentAgent**: Handles travel documents, visas, reminders.
+- **WeatherAgent**: Checks weather and suggests adjustments.
+- **FlightAgent**: Fetches real-time flight prices and options.
+- **ChatAgent**: Handles user queries and coordinates with other agents.
+
+### Architecture
+
+- **AgentOrchestrator**: Routes tasks, aggregates results, and resolves agent conflicts using event-driven communication.
+- **Context Propagation**: User and trip context are shared across agents for personalized planning.
+- **Explainability**: Agent decisions and reasoning are logged and visualized in the UI.
+
+### Trip Creation Flow
+
+- Users must input trip start and end dates.
+- Agents collaborate to plan itinerary, optimize budget, find hotels and flights, suggest activities, and handle documents.
+
+### UI Enhancements
+
+- Date pickers for start/end dates.
+- Trip plan display includes flights, hotels, activities, and budget breakdown.
+- Agent logs and decisions are shown for transparency.
+
+### Reasoning
+
+- Agents use rule-based, ML, or LLM-based logic for autonomous decision-making and negotiation.
+
+---
+
+For more details, see the agents/ directory and context/ files.
+
+## Transport API Integration (Free)
+
+This app now uses free transport/geospatial APIs to improve itinerary transport suggestions:
+
+- Nominatim (OpenStreetMap) for geocoding origin/destination and nearby airports.
+- OSRM public API for road travel duration and distance estimates.
+
+Endpoint added:
+
+- `POST /api/transport`
+
+Input:
+
+```json
+{
+  "origin": "Kalyan, India",
+  "destination": "Mahabaleshwar, India",
+  "startDate": "2026-03-20"
+}
+```
+
+Output includes:
+
+- Outbound journey legs with leave time, arrival time, and duration.
+- Return journey legs with timings.
+- Luggage policy guidance (2+ large bags).
+
+### Luggage-Aware Rule
+
+The itinerary generator is explicitly instructed to avoid recommending crowded local trains for travelers carrying 2+ large bags when practical alternatives (cab, shuttle, AC intercity bus, private transfer) exist.
+
+### Environment Variables
+
+Copy `.env.example` to `.env.local` and set:
+
+- `OPENROUTER_API_KEY`
+- `ARCJET_KEY`
+- Existing app keys: `NEXT_PUBLIC_CONVEX_URL`, `CLERK_PUBLISHABLE_KEY`, `CLERK_SECRET_KEY`
